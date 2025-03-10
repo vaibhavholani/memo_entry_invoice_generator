@@ -4,10 +4,12 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import InvoiceItemsTable from "./InvoiceItemsTable";
 import { Button } from "./ui/button";
+import { formatDateToDDMMYYYY, getTodayForDateInput } from "../utils/dateUtils";
 
 interface InvoiceFormData {
   memoNumber: string;
   supplierName: string;
+  date: string;
   items: Array<{
     id: string;
     ddAmount: number;
@@ -36,6 +38,7 @@ interface InvoiceFormProps {
 const defaultFormData: InvoiceFormData = {
   memoNumber: "MEM001",
   supplierName: "Sample Supplier",
+  date: getTodayForDateInput(),
   items: [
     {
       id: "1",
@@ -93,13 +96,17 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const formattedData = {
+      ...formData,
+      date: formatDateToDDMMYYYY(formData.date)
+    };
+    onSubmit(formattedData);
   };
 
   return (
     <Card className="w-full max-w-4xl mx-auto p-6 bg-white">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           <div className="space-y-2">
             <Label htmlFor="memoNumber">Memo Number</Label>
             <Input
@@ -118,6 +125,15 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 handleInputChange("supplierName", e.target.value)
               }
               placeholder="Enter Supplier Name"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="date">Date</Label>
+            <Input
+              id="date"
+              type="date"
+              value={formData.date}
+              onChange={(e) => handleInputChange("date", e.target.value)}
             />
           </div>
         </div>

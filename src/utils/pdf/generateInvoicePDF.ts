@@ -8,6 +8,7 @@ import { calculateNetTotal } from "../calculations";
 interface InvoiceData {
   memoNumber: string;
   supplierName: string;
+  date: string;
   items: Array<{
     id: string;
     ddAmount: number;
@@ -47,6 +48,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData) => {
     pageWidth,
     memoNumber: invoiceData.memoNumber,
     supplierName: invoiceData.supplierName,
+    date: invoiceData.date,
   });
 
   // Draw table and get table info
@@ -85,6 +87,7 @@ export const generateInvoicePDF = (invoiceData: InvoiceData) => {
     margin,
     pageWidth,
     pageHeight,
+    date: invoiceData.date,
   });
 
   // Add page numbers if multiple pages
