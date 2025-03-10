@@ -74,6 +74,14 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
     );
   })();
 
+  // Format currency in Indian
+  const formatIndianCurrency = (amount: number): string => {
+    return amount.toLocaleString('en-IN', {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2
+    });
+  };
+
   return (
     <Card
       id="invoice-preview"
@@ -117,8 +125,8 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                     className={`border-b ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
                   >
                     <td className="py-2 px-2">{index + 1}</td>
-                    <td className="py-2 px-2">{item.ddAmount}</td>
-                    <td className="py-2 px-2">{item.billAmount}</td>
+                    <td className="py-2 px-2">{item.ddAmount > 0 ? formatIndianCurrency(item.ddAmount) : ''}</td>
+                    <td className="py-2 px-2">{formatIndianCurrency(item.billAmount)}</td>
                     <td className="py-2 px-2">{item.billNumber}</td>
                     <td className="py-2 px-2">{item.partyName}</td>
                     <td className="py-2 px-2">{item.bankName}</td>
@@ -135,38 +143,40 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                 <tr className="border-t-2 border-b border-black">
                   <td className="border px-2 py-0.5 w-[15%]"></td>
                   <td className="border px-2 py-0.5 w-[15%] text-right">
-                    {totalBillAmount.toFixed(2)}
+                    {formatIndianCurrency(totalBillAmount)}
                   </td>
-                  <td className="border px-2 py-0.5 w-[15%] text-right">
-                    {totals.lessTotal.toFixed(2)}
+                  <td className="border px-2 py-0.5 w-[15%] relative" style={{ minHeight: "30px" }}>
+                    <div className="absolute bottom-0.5 left-0.5 text-[8px] font-bold">Less Total</div>
+                    <div className="text-right">{formatIndianCurrency(totals.lessTotal)}</div>
                   </td>
                   <td className="border px-2 py-0.5 w-[20%] text-center" rowSpan={2}>
                     Dis. {totals.discountPercentage}%<br/>
-                    R/D {totals.rd.toFixed(2)}
+                    R/D {formatIndianCurrency(totals.rd)}
                   </td>
                   <td className="border px-2 py-0.5 w-[15%] text-center" rowSpan={2}>
                     G/R<br/>
-                    {totals.gr.toFixed(2)}
+                    {formatIndianCurrency(totals.gr)}
                   </td>
                   <td className="border px-2 py-0.5 text-center" rowSpan={2}>
                     Other Difference<br/>
-                    {totals.otherDifference.toFixed(2)}
+                    {formatIndianCurrency(totals.otherDifference)}
                   </td>
                 </tr>
                 <tr className="border-b-2 border-black">
                   <td className="border px-2 py-0.5 text-right">
-                    {totalDDAmount.toFixed(2)}
+                    {totalDDAmount > 0 ? formatIndianCurrency(totalDDAmount) : ''}
                   </td>
                   <td className="border px-2 py-0.5"></td>
-                  <td className="border px-2 py-0.5 text-right">
-                    {totals.gTotal.toFixed(2)}
+                  <td className="border px-2 py-0.5 relative" style={{ minHeight: "30px" }}>
+                    <div className="absolute bottom-0.5 left-0.5 text-[8px] font-bold">G. Total</div>
+                    <div className="text-right">{formatIndianCurrency(totals.gTotal)}</div>
                   </td>
                 </tr>
               </tbody>
             </table>
             <div className="text-right mt-2">
               <span className="font-semibold text-xs">
-                Net Amount: {netTotal.toFixed(2)}
+                Net Amount: {formatIndianCurrency(netTotal)}
               </span>
             </div>
           </div>
