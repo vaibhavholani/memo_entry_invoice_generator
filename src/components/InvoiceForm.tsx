@@ -24,6 +24,7 @@ interface InvoiceFormData {
     rd: number;
     gr: number;
     otherDifference: number;
+    netTotal?: number;
   };
 }
 
@@ -53,6 +54,7 @@ const defaultFormData: InvoiceFormData = {
     rd: 0,
     gr: 0,
     otherDifference: 0,
+    netTotal: 0,
   },
 };
 
@@ -201,6 +203,20 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 onChange={(e) =>
                   handleTotalsChange(
                     "otherDifference",
+                    parseFloat(e.target.value) || 0,
+                  )
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="netTotal">Net Total</Label>
+              <Input
+                id="netTotal"
+                type="number"
+                value={formData.totals.netTotal}
+                onChange={(e) =>
+                  handleTotalsChange(
+                    "netTotal",
                     parseFloat(e.target.value) || 0,
                   )
                 }

@@ -19,6 +19,7 @@ interface InvoiceTotals {
   rd: number;
   gr: number;
   otherDifference: number;
+  netTotal?: number;
 }
 
 interface InvoicePreviewProps {
@@ -47,6 +48,7 @@ const defaultTotals: InvoiceTotals = {
   rd: 0,
   gr: 0,
   otherDifference: 0,
+  netTotal: 0,
 };
 
 const InvoicePreview: React.FC<InvoicePreviewProps> = ({
@@ -55,33 +57,33 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   memoNumber = "MEM001",
   supplierName = "Sample Supplier",
 }) => {
-  const calculateTotal = () => {
-    return items.reduce((sum, item) => sum + item.billAmount, 0);
-  };
-
-  const calculateNetTotal = () => {
-    const total = calculateTotal();
-    const discountAmount = total * (totals.discountPercentage / 100);
+  // Calculate totals
+  const totalDDAmount = items.reduce((sum, item) => sum + item.ddAmount, 0);
+  const totalBillAmount = items.reduce((sum, item) => sum + item.billAmount, 0);
+  
+  // Calculate net total if not provided
+  const netTotal = totals.netTotal ?? (() => {
+    const discountAmount = totalBillAmount * (totals.discountPercentage / 100);
     return (
-      total -
+      totalBillAmount -
       totals.lessTotal -
       discountAmount -
       totals.rd -
       totals.gr -
       totals.otherDifference
     );
-  };
+  })();
 
   return (
     <Card
       id="invoice-preview"
-      className="w-full max-w-[600px] p-8 bg-white shadow-lg"
+      className="w-full max-w-[1000px] p-6 bg-white shadow-lg"
     >
       <div className="space-y-6">
         <div className="flex justify-between border-b pb-4">
           <div>
-            <h1 className="text-2xl font-bold">Global Holani Tradelink</h1>
-            <p className="text-sm text-gray-600">
+            <h1 className="text-xl font-bold">Global Holani Tradelink</h1>
+            <p className="text-xs text-gray-600">
               1128, 1st and 2nd floor, Kucha natwan, Chandni Chowk
             </p>
             <p className="text-sm text-gray-600">Delhi - 110006</p>
@@ -95,87 +97,89 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
         <Separator />
 
         <div className="space-y-4">
-          <table className="w-full text-sm border-collapse">
-            <thead>
-              <tr className="border-b">
-                <th className="text-left py-2">D/D Amount</th>
-                <th className="text-left py-2">Bill Amount</th>
-                <th className="text-left py-2">Bill Number</th>
-                <th className="text-left py-2">Party's Name</th>
-                <th className="text-left py-2">Bank Name</th>
-                <th className="text-left py-2">D/D No.</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-b">
-                  <td className="py-2">{item.ddAmount}</td>
-                  <td className="py-2">{item.billAmount}</td>
-                  <td className="py-2">{item.billNumber}</td>
-                  <td className="py-2">{item.partyName}</td>
-                  <td className="py-2">{item.bankName}</td>
-                  <td className="py-2">{item.ddNo}</td>
+          <div className="max-h-[400px] overflow-auto">
+            <table className="w-full text-xs border-collapse">
+              <thead className="sticky top-0 bg-white">
+                <tr className="border-b">
+                  <th className="text-left py-2 px-2 w-[5%]">#</th>
+                  <th className="text-left py-2 px-2 w-[12%]">D/D Amount</th>
+                  <th className="text-left py-2 px-2 w-[12%]">Bill Amount</th>
+                  <th className="text-left py-2 px-2 w-[15%]">Bill Number</th>
+                  <th className="text-left py-2 px-2 w-[20%]">Party's Name</th>
+                  <th className="text-left py-2 px-2 w-[20%]">Bank Name</th>
+                  <th className="text-left py-2 px-2 w-[16%]">D/D No.</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="mt-6 border-t pt-4 space-y-2">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p>
-                  <span className="font-semibold">G. Total:</span> ₹
-                  {calculateTotal().toFixed(2)}
-                </p>
-                <p>
-                  <span className="font-semibold">Less Total:</span> ₹
-                  {totals.lessTotal}
-                </p>
-                <p>
-                  <span className="font-semibold">Dis %:</span>{" "}
-                  {totals.discountPercentage}%
-                </p>
-              </div>
-              <div>
-                <p>
-                  <span className="font-semibold">RD:</span> ₹{totals.rd}
-                </p>
-                <p>
-                  <span className="font-semibold">G/R:</span> ₹{totals.gr}
-                </p>
-                <p>
-                  <span className="font-semibold">Other Difference:</span> ₹
-                  {totals.otherDifference}
-                </p>
-              </div>
-            </div>
-            <div className="border-t pt-2 mt-2">
-              <p className="text-right font-bold">
-                Net Amount: ₹{calculateNetTotal().toFixed(2)}
-              </p>
-            </div>
+              </thead>
+              <tbody>
+                {items.map((item, index) => (
+                  <tr 
+                    key={item.id} 
+                    className={`border-b ${index % 2 === 0 ? 'bg-gray-50' : ''}`}
+                  >
+                    <td className="py-2 px-2">{index + 1}</td>
+                    <td className="py-2 px-2">{item.ddAmount}</td>
+                    <td className="py-2 px-2">{item.billAmount}</td>
+                    <td className="py-2 px-2">{item.billNumber}</td>
+                    <td className="py-2 px-2">{item.partyName}</td>
+                    <td className="py-2 px-2">{item.bankName}</td>
+                    <td className="py-2 px-2">{item.ddNo}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-
-          <div className="border-t pt-4">
-            <div className="flex justify-between">
-              <span className="font-semibold">Total Amount:</span>
-              <span>{calculateTotal().toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between font-bold">
-              <span>Net Total:</span>
-              <span>{calculateNetTotal().toFixed(2)}</span>
+          
+          <div className="mt-4">
+            <table className="w-full text-xs border-collapse">
+              <tbody>
+                <tr className="border-t-2 border-b border-black">
+                  <td className="border px-2 py-0.5 w-[15%]"></td>
+                  <td className="border px-2 py-0.5 w-[15%] text-right">
+                    {totalBillAmount.toFixed(2)}
+                  </td>
+                  <td className="border px-2 py-0.5 w-[15%] text-right">
+                    {totals.lessTotal.toFixed(2)}
+                  </td>
+                  <td className="border px-2 py-0.5 w-[20%] text-center" rowSpan={2}>
+                    Dis. {totals.discountPercentage}%<br/>
+                    R/D {totals.rd.toFixed(2)}
+                  </td>
+                  <td className="border px-2 py-0.5 w-[15%] text-center" rowSpan={2}>
+                    G/R<br/>
+                    {totals.gr.toFixed(2)}
+                  </td>
+                  <td className="border px-2 py-0.5 text-center" rowSpan={2}>
+                    Other Difference<br/>
+                    {totals.otherDifference.toFixed(2)}
+                  </td>
+                </tr>
+                <tr className="border-b-2 border-black">
+                  <td className="border px-2 py-0.5 text-right">
+                    {totalDDAmount.toFixed(2)}
+                  </td>
+                  <td className="border px-2 py-0.5"></td>
+                  <td className="border px-2 py-0.5 text-right">
+                    {totals.gTotal.toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="text-right mt-2">
+              <span className="font-semibold text-xs">
+                Net Amount: {netTotal.toFixed(2)}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8 pt-6 border-t">
+        <div className="grid grid-cols-2 gap-8 pt-4 border-t mt-4">
           <div>
-            <p className="text-sm mb-2">Received Date: _________________</p>
-            <p className="text-sm">Receiver's Signature: _________________</p>
+            <p className="text-xs mb-4">Received Date: _________________</p>
+            <p className="text-xs">Receiver's Signature: _________________</p>
           </div>
           <div className="text-right">
-            <p className="text-sm mb-2">Signature: _________________</p>
-            <p className="text-sm">Date: _________________</p>
+            <p className="text-xs mb-4">Signature: _________________</p>
+            <p className="text-xs">Date: _________________</p>
           </div>
         </div>
       </div>

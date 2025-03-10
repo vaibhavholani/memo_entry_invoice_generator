@@ -1,6 +1,5 @@
 import React from "react";
-import jspdf from "jspdf";
-import html2canvas from "html2canvas";
+import { generateInvoicePDF } from "../utils/pdf/generateInvoicePDF";
 import ActionBar from "./ActionBar";
 import InvoiceForm from "./InvoiceForm";
 import InvoicePreview from "./InvoicePreview";
@@ -24,6 +23,7 @@ interface InvoiceData {
     rd: number;
     gr: number;
     otherDifference: number;
+    netTotal?: number;
   };
 }
 
@@ -48,6 +48,7 @@ const defaultInvoiceData: InvoiceData = {
     rd: 0,
     gr: 0,
     otherDifference: 0,
+    netTotal: 0,
   },
 };
 
@@ -67,31 +68,9 @@ export default function Home() {
     window.print();
   };
 
-  const handleExport = async () => {
-    const previewElement = document.getElementById("invoice-preview");
-    if (!previewElement) return;
-
-    try {
-      const canvas = await html2canvas(previewElement, {
-        scale: 2,
-        backgroundColor: "#ffffff",
-      });
-
-      const pdf = new jspdf.jsPDF({
-        orientation: "portrait",
-        unit: "mm",
-        format: "a4",
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`invoice-${invoiceData.memoNumber}.pdf`);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-    }
+  const handleExport = () => {
+    const pdf = generateInvoicePDF(invoiceData);
+    pdf.save(`invoice-${invoiceData.memoNumber}.pdf`);
   };
 
   return (
@@ -103,7 +82,7 @@ export default function Home() {
       />
 
       <div className="container mx-auto py-6 px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900">
               Invoice Details
