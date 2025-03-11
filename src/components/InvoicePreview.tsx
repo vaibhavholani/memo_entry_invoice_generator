@@ -1,6 +1,7 @@
 import React from "react";
 import { Card } from "./ui/card";
 import { Separator } from "./ui/separator";
+import { formatDateToDDMMYYYY, getTodayForDateInput } from "../utils/dateUtils";
 
 interface InvoiceItem {
   id: string;
@@ -27,6 +28,7 @@ interface InvoicePreviewProps {
   totals?: InvoiceTotals;
   memoNumber?: string;
   supplierName?: string;
+  date?: string;
 }
 
 const defaultItems: InvoiceItem[] = [
@@ -56,7 +58,17 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   totals = defaultTotals,
   memoNumber = "MEM001",
   supplierName = "Sample Supplier",
+  date = getTodayForDateInput(),
 }) => {
+  // Format the date to DD/MM/YYYY for display
+  const formattedDate = React.useMemo(() => {
+    // Check if the date is already in DD/MM/YYYY format
+    if (date.includes('/')) {
+      return date;
+    }
+    return formatDateToDDMMYYYY(date);
+  }, [date]);
+
   // Calculate totals
   const totalDDAmount = items.reduce((sum, item) => sum + item.ddAmount, 0);
   const totalBillAmount = items.reduce((sum, item) => sum + item.billAmount, 0);
@@ -189,7 +201,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
           </div>
           <div className="text-right">
             <p className="text-xs mb-4">Signature: _________________</p>
-            <p className="text-xs">Date: _________________</p>
+            <p className="text-xs">Date: {formattedDate}</p>
           </div>
         </div>
       </div>

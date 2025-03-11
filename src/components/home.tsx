@@ -3,10 +3,12 @@ import { generateInvoicePDF } from "../utils/pdf/generateInvoicePDF";
 import ActionBar from "./ActionBar";
 import InvoiceForm from "./InvoiceForm";
 import InvoicePreview from "./InvoicePreview";
+import { getTodayForDateInput } from "../utils/dateUtils";
 
 interface InvoiceData {
   memoNumber: string;
   supplierName: string;
+  date: string;
   items: Array<{
     id: string;
     ddAmount: number;
@@ -30,6 +32,7 @@ interface InvoiceData {
 const defaultInvoiceData: InvoiceData = {
   memoNumber: "MEM001",
   supplierName: "Sample Supplier",
+  date: getTodayForDateInput(), // Default to today's date in YYYY-MM-DD format
   items: [
     {
       id: "1",
@@ -100,6 +103,7 @@ export default function Home() {
               totals={invoiceData.totals}
               memoNumber={invoiceData.memoNumber}
               supplierName={invoiceData.supplierName}
+              date={invoiceData.date}
             />
           </div>
         </div>

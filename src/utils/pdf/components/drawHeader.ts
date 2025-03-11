@@ -6,6 +6,7 @@ interface HeaderProps {
   pageWidth: number;
   memoNumber: string;
   supplierName: string;
+  date: string;
 }
 
 export const drawHeader = ({
@@ -14,6 +15,7 @@ export const drawHeader = ({
   pageWidth,
   memoNumber,
   supplierName,
+  date,
 }: HeaderProps) => {
   const headerHeight = 25;
   const usableWidth = pageWidth - 2 * margin;
