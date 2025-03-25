@@ -13,13 +13,20 @@ import { Plus, Trash2 } from "lucide-react";
 
 interface InvoiceItem {
   id: string;
-  ddAmount: number;
+  ddAmount?: number;
   billAmount: number;
   billNumber: string;
-  partyName: string;
-  bankName: string;
-  ddNo: string;
+  partyName?: string;
+  bankName?: string;
+  ddNo?: string;
+  payments?: Array<{
+    bank_id: number;
+    bank_name?: string;
+    cheque_number: number;
+    amount?: number;
+  }>;
 }
+
 
 interface InvoiceItemsTableProps {
   items?: InvoiceItem[];
@@ -68,7 +75,7 @@ const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
     onItemsChange(items.filter((item) => item.id !== id));
   };
 
-  const updateItem = (id: string, field: keyof InvoiceItem, value: number) => {
+  const updateItem = (id: string, field: keyof InvoiceItem, value: any) => {
     onItemsChange(
       items.map((item) =>
         item.id === id ? { ...item, [field]: value } : item,

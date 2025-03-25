@@ -10,7 +10,7 @@ interface TotalsProps {
   totals: {
     lessTotal: number;
     gTotal: number;
-    discountPercentage: number;
+    discountAmounts: number;
     rd: number;
     gr: number;
     otherDifference: number;
@@ -70,7 +70,7 @@ export const drawTotals = ({
 
   // Draw cells that span both rows
   const spanningCells = [
-    { text: `${totals.discountPercentage}%\n${totals.rd.toFixed(2)}`, width: colWidths[3] },
+    { text: `${totals.discountAmounts}%\n${totals.rd.toFixed(2)}`, width: colWidths[3] },
     { text: totals.gr.toFixed(2), width: colWidths[4] },
     { text: totals.otherDifference.toFixed(2), width: colWidths[5] }
   ];

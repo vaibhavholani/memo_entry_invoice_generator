@@ -19,7 +19,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
         Invoice Generator
       </div>
       <div className="flex items-center gap-4">
-        <Button
+        {/* <Button
           variant="outline"
           className="flex items-center gap-2"
           onClick={onSave}
@@ -34,7 +34,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
         >
           <Printer className="h-4 w-4" />
           Print
-        </Button>
+        </Button> */}
         <Button
           variant="default"
           className="flex items-center gap-2"

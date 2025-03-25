@@ -6,27 +6,40 @@ import InvoiceItemsTable from "./InvoiceItemsTable";
 import { Button } from "./ui/button";
 import { formatDateToDDMMYYYY, getTodayForDateInput } from "../utils/dateUtils";
 
-interface InvoiceFormData {
+export interface InvoiceFormData {
   memoNumber: string;
   supplierName: string;
   date: string;
   items: Array<{
     id: string;
-    ddAmount: number;
+    ddAmount?: number;
     billAmount: number;
     billNumber: string;
-    partyName: string;
-    bankName: string;
-    ddNo: string;
-  }>;
+    partyName?: string;
+    bankName?: string;
+    ddNo?: string;
+    }>;
+  lessDetails: {
+    gr_amount?: string[];
+    discount?: string[];
+    other_deduction?: string[];
+    rate_difference?: string[];
+  };
+  partDetails: {
+    memo_id: number;
+    memo_number: number;
+    amount: number;
+  }[];
+  note?: string; // Added note field
   totals: {
     gTotal: number;
     lessTotal: number;
-    discountPercentage: number;
+    discount: number;
     rd: number;
     gr: number;
     otherDifference: number;
     netTotal?: number;
+    rateDifference: number;
   };
 }
 
@@ -50,14 +63,22 @@ const defaultFormData: InvoiceFormData = {
       ddNo: "DD001",
     },
   ],
+  lessDetails: {
+    gr_amount: [],
+    discount: [],
+    other_deduction: [],
+    rate_difference: []
+  },
+  partDetails: [],
   totals: {
     gTotal: 0,
     lessTotal: 0,
-    discountPercentage: 0,
+    discount: 0,
     rd: 0,
     gr: 0,
     otherDifference: 0,
     netTotal: 0,
+    rateDifference: 0,
   },
 };
 
@@ -66,6 +87,9 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
   onSubmit = () => {},
 }) => {
   const [formData, setFormData] = React.useState<InvoiceFormData>(initialData);
+
+  console.log("formData in InvoiceForm");
+  console.log(formData);
 
   const handleTotalsChange = (
     field: keyof InvoiceFormData["totals"],
@@ -103,10 +127,16 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
     onSubmit(formattedData);
   };
 
+  React.useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
   return (
     <Card className="w-full max-w-4xl mx-auto p-6 bg-white">
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
           <div className="space-y-2">
             <Label htmlFor="memoNumber">Memo Number</Label>
             <Input
@@ -175,14 +205,14 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="discountPercentage">Dis %</Label>
+              <Label htmlFor="discount">Deduction </Label>
               <Input
-                id="discountPercentage"
+                id="discount"
                 type="number"
-                value={formData.totals.discountPercentage}
+                value={formData.totals.discount}
                 onChange={(e) =>
                   handleTotalsChange(
-                    "discountPercentage",
+                    "discount",
                     parseFloat(e.target.value) || 0,
                   )
                 }
@@ -233,6 +263,20 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 onChange={(e) =>
                   handleTotalsChange(
                     "netTotal",
+                    parseFloat(e.target.value) || 0,
+                  )
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="rateDifference">Rate Difference</Label>
+              <Input
+                id="rateDifference"
+                type="number"
+                value={formData.totals.rateDifference}
+                onChange={(e) =>
+                  handleTotalsChange(
+                    "rateDifference",
                     parseFloat(e.target.value) || 0,
                   )
                 }
