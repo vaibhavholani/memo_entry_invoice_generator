@@ -20,6 +20,9 @@ interface InvoiceTotals {
   rd: number;
   gr: number;
   otherDifference: number;
+  gstEnabled: boolean;
+  gstPercentage: number;
+  gstAmount: number;
   netTotal?: number;
 }
 
@@ -50,6 +53,9 @@ const defaultTotals: InvoiceTotals = {
   rd: 0,
   gr: 0,
   otherDifference: 0,
+  gstEnabled: false,
+  gstPercentage: 18,
+  gstAmount: 0,
   netTotal: 0,
 };
 
@@ -76,7 +82,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
   // Calculate net total if not provided
   const netTotal = totals.netTotal ?? (() => {
     const discountAmount = totalBillAmount * (totals.discountPercentage / 100);
-    return (
+    const baseAmount = (
       totalBillAmount -
       totals.lessTotal -
       discountAmount -
@@ -84,6 +90,13 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
       totals.gr -
       totals.otherDifference
     );
+    
+    // Add GST if enabled
+    if (totals.gstEnabled) {
+      return baseAmount + totals.gstAmount;
+    }
+    
+    return baseAmount;
   })();
 
   // Format currency in Indian
@@ -173,6 +186,12 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({
                     Other Difference<br/>
                     {formatIndianCurrency(totals.otherDifference)}
                   </td>
+                  {totals.gstEnabled && (
+                    <td className="border px-2 py-0.5 text-center" rowSpan={2}>
+                      GST {totals.gstPercentage}%<br/>
+                      {formatIndianCurrency(totals.gstAmount)}
+                    </td>
+                  )}
                 </tr>
                 <tr className="border-b-2 border-black">
                   <td className="border px-2 py-0.5 text-right">
