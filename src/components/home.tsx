@@ -25,6 +25,9 @@ interface InvoiceData {
     rd: number;
     gr: number;
     otherDifference: number;
+    gstEnabled: boolean;
+    gstPercentage: number;
+    gstAmount: number;
     netTotal?: number;
   };
 }
@@ -51,6 +54,9 @@ const defaultInvoiceData: InvoiceData = {
     rd: 0,
     gr: 0,
     otherDifference: 0,
+    gstEnabled: false,
+    gstPercentage: 18,
+    gstAmount: 0,
     netTotal: 0,
   },
 };

@@ -4,6 +4,7 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import InvoiceItemsTable from "./InvoiceItemsTable";
 import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
 import { formatDateToDDMMYYYY, getTodayForDateInput } from "../utils/dateUtils";
 
 interface InvoiceFormData {
@@ -26,6 +27,9 @@ interface InvoiceFormData {
     rd: number;
     gr: number;
     otherDifference: number;
+    gstEnabled: boolean;
+    gstPercentage: number;
+    gstAmount: number;
     netTotal?: number;
   };
 }
@@ -57,6 +61,9 @@ const defaultFormData: InvoiceFormData = {
     rd: 0,
     gr: 0,
     otherDifference: 0,
+    gstEnabled: false,
+    gstPercentage: 18,
+    gstAmount: 0,
     netTotal: 0,
   },
 };
@@ -69,7 +76,7 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
 
   const handleTotalsChange = (
     field: keyof InvoiceFormData["totals"],
-    value: number,
+    value: number | boolean,
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -224,6 +231,50 @@ const InvoiceForm: React.FC<InvoiceFormProps> = ({
                 }
               />
             </div>
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="gstEnabled"
+                  checked={formData.totals.gstEnabled}
+                  onCheckedChange={(checked) =>
+                    handleTotalsChange("gstEnabled", checked as boolean)
+                  }
+                />
+                <Label htmlFor="gstEnabled">Enable GST</Label>
+              </div>
+            </div>
+            {formData.totals.gstEnabled && (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="gstPercentage">GST %</Label>
+                  <Input
+                    id="gstPercentage"
+                    type="number"
+                    value={formData.totals.gstPercentage}
+                    onChange={(e) =>
+                      handleTotalsChange(
+                        "gstPercentage",
+                        parseFloat(e.target.value) || 0,
+                      )
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gstAmount">GST Amount</Label>
+                  <Input
+                    id="gstAmount"
+                    type="number"
+                    value={formData.totals.gstAmount}
+                    onChange={(e) =>
+                      handleTotalsChange(
+                        "gstAmount",
+                        parseFloat(e.target.value) || 0,
+                      )
+                    }
+                  />
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Label htmlFor="netTotal">Net Total</Label>
               <Input
